@@ -33,7 +33,7 @@ def nii_process(nii_arr):
     Returns:
         img_trans (np.array): output np.array of nii image (D,H,W)
     """
-    image = np.transpose(nii_arr,(2,0,1))
+    image = np.transpose(nii_arr,(2,0,1))[np.newaxis, ...]
     #value min/max
     image = image - image.min()
     image = image / np.clip(image.max(), a_min=1e-8, a_max=None)
