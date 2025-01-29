@@ -143,10 +143,11 @@ def main():
         if img_path.endswith('.nii') or img_path.endswith('.nii.gz'):
             image_np = nib.load(img_path).get_fdata()
             image_np = nii_process(image_np)
+            image_pt = torch.Tensor(image_np).unsqueeze(0).to(dtype=dtype, device=device)
         else:
             image_np = np.load(img_path)
+            image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
         print(image_np.shape)
-        image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
 
         generation = model.generate(image_pt, input_id, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
         # generation, seg_logit = model.generate(image_pt, input_id, seg_enable=True, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
