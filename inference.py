@@ -9,6 +9,7 @@ import simple_slice_viewer as ssv
 import SimpleITK as sikt
 # from LaMed.src.model.language_model import *
 import matplotlib.pyplot as plt
+import monai.transforms as mtf
 
 def seed_everything(seed):
     torch.manual_seed(seed)
@@ -19,8 +20,26 @@ def seed_everything(seed):
     torch.backends.cudnn.deterministic = True
     torch.cuda.manual_seed_all(seed)
 
+transform = mtf.Compose([
+    mtf.CropForeground(),
+    mtf.Resize(spatial_size=[32, 256, 256], mode="bilinear")
+])
 def nii_process(nii_arr):
-    return nii_arr
+    """_summary_
+
+    Args:
+        nii_arr (np.array): input np.array of nii image (H,W,D)
+
+    Returns:
+        img_trans (np.array): output np.array of nii image (D,H,W)
+    """
+    image = np.transpose(nii_arr,(2,0,1))
+    #value min/max
+    image = image - image.min()
+    image = image / np.clip(image.max(), a_min=1e-8, a_max=None)
+    #transform
+    img_trans = transform(image)
+    return img_trans
 
 @dataclass
 class AllArguments:
@@ -65,7 +84,7 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name_or_path,
         torch_dtype=dtype,
-        device_map='auto',
+        device_map='cuda',
         trust_remote_code=True
     )
     model = model.to(device=device)
