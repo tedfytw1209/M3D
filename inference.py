@@ -88,12 +88,15 @@ report_gen_prompts = [
     "Can you provide a caption consists of findings for this medical scan?"
 ]
 
-def main(file_args):
+def main():
     seed_everything(42)
     device = torch.device('cuda') # 'cpu', 'cuda'
     dtype = torch.float16 # or bfloat16, float16, float32
 
     parser = transformers.HfArgumentParser(AllArguments)
+    parser.add_argument("--image-folder", type=str, default="")
+    parser.add_argument("--question-file", type=str, default="tables/question.jsonl")
+    parser.add_argument("--answers-file", type=str, default="answer.jsonl")
     args = parser.parse_args_into_dataclasses()[0]
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -112,12 +115,12 @@ def main(file_args):
     model = model.to(device=device)
     
     #inference data
-    questions = [json.loads(q) for q in open(os.path.expanduser(file_args.question_file), "r")]
+    questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
     question_keys = [k for k in questions[0].keys()]
     img_key = get_img_key(question_keys)
     ques_key = 'text'
     out_data = []
-    ans_file = open(file_args.answers_file, "w")
+    ans_file = open(args.answers_file, "w")
     i = 0
     for question_row in tqdm(questions):
         i += 1
@@ -134,7 +137,7 @@ def main(file_args):
         image_tokens = "<im_patch>" * args.proj_out_num
         input_txt = image_tokens + question
         input_id = tokenizer(input_txt, return_tensors="pt")['input_ids'].to(device=device)
-        img_path = os.path.join(file_args.image_folder, question_row[img_key])
+        img_path = os.path.join(args.image_folder, question_row[img_key])
 
         if img_path.endswith('.nii') or img_path.endswith('.nii.gz'):
             image_np = nib.load(img_path).get_fdata()
@@ -166,10 +169,4 @@ def main(file_args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--image-folder", type=str, default="")
-    parser.add_argument("--question-file", type=str, default="tables/question.jsonl")
-    parser.add_argument("--answers-file", type=str, default="answer.jsonl")
-    args = parser.parse_args()
-
-    main(args)
+    main()
