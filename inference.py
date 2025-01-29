@@ -1,3 +1,5 @@
+import argparse
+import os
 import transformers
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import random
@@ -10,6 +12,9 @@ import SimpleITK as sikt
 # from LaMed.src.model.language_model import *
 import matplotlib.pyplot as plt
 import monai.transforms as mtf
+import json
+from tqdm import tqdm
+import shortuuid
 
 def seed_everything(seed):
     torch.manual_seed(seed)
@@ -40,6 +45,23 @@ def nii_process(nii_arr):
     #transform
     img_trans = transform(image)
     return img_trans
+#get img key
+def get_img_key(question_keys):
+    if 'image' in question_keys:
+        img_key = 'image'
+    elif 'filename' in question_keys:
+        img_key = 'filename'
+    elif "image:" in question_keys:
+        img_key = 'image:'
+    else:
+        img_key = "image"
+    return img_key
+##data save
+def save_jsonl(out_path,data):
+    with open(out_path, 'w') as outfile:
+        for entry in data:
+            json.dump(entry, outfile)
+            outfile.write('\n')
 
 @dataclass
 class AllArguments:
@@ -66,7 +88,7 @@ report_gen_prompts = [
     "Can you provide a caption consists of findings for this medical scan?"
 ]
 
-def main():
+def main(file_args):
     seed_everything(42)
     device = torch.device('cuda') # 'cpu', 'cuda'
     dtype = torch.float16 # or bfloat16, float16, float32
@@ -88,49 +110,63 @@ def main():
         trust_remote_code=True
     )
     model = model.to(device=device)
+    
+    #inference data
+    questions = [json.loads(q) for q in open(os.path.expanduser(file_args.question_file), "r")]
+    question_keys = [k for k in questions[0].keys()]
+    img_key = get_img_key(question_keys)
+    ques_key = 'text'
+    out_data = []
+    i = 0
+    for question_row in tqdm(questions):
+        i += 1
+        if 'question_id' in question_keys:
+            idx = question_row["question_id"]
+        elif 'image_id' in question_keys:
+            idx = question_row["image_id"]
+        else:
+            idx = i
+        question = report_gen_prompts[0]
+        # question = "What is liver in this image? Please output the segmentation mask."
+        # question = "What is liver in this image? Please output the box."
 
-    question = report_gen_prompts[0]
-    # question = "What is liver in this image? Please output the segmentation mask."
-    # question = "What is liver in this image? Please output the box."
+        image_tokens = "<im_patch>" * args.proj_out_num
+        input_txt = image_tokens + question
+        input_id = tokenizer(input_txt, return_tensors="pt")['input_ids'].to(device=device)
+        img_path = os.path.join(file_args.image_folder, question_row[img_key])
 
-    image_tokens = "<im_patch>" * args.proj_out_num
-    input_txt = image_tokens + question
-    input_id = tokenizer(input_txt, return_tensors="pt")['input_ids'].to(device=device)
+        if img_path.endswith('.nii') or img_path.endswith('.nii.gz'):
+            image_np = nib.load(img_path).get_fdata()
+            image_np = nii_process(image_np)
+        else:
+            image_np = np.load(img_path)
+        print(image_np.shape)
+        image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
 
-    if args.image_path.endswith('.nii') or args.image_path.endswith('.nii.gz'):
-        image_np = nib.load(args.image_path).get_fdata()
-        image_np = nii_process(image_np)
-    else:
-        image_np = np.load(args.image_path)
-    print(image_np.shape)
-    image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
+        generation = model.generate(image_pt, input_id, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
+        # generation, seg_logit = model.generate(image_pt, input_id, seg_enable=True, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
 
-    generation = model.generate(image_pt, input_id, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
-    # generation, seg_logit = model.generate(image_pt, input_id, seg_enable=True, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
+        generated_texts = tokenizer.batch_decode(generation, skip_special_tokens=True)
+        #seg_mask = (torch.sigmoid(seg_logit) > 0.5) * 1.0
+        #print('question', question)
+        #print('generated_texts', generated_texts[0])
+        ans_id = shortuuid.uuid()
+        out_dict = {"question_id": idx,
+                    "prompt": question,
+                    "text": generated_texts[0],
+                    "answer_id": ans_id,
+                    "model_id": args.model_name_or_path,
+                    "metadata": {}}
+        out_data.append(out_dict)
+        
+    save_jsonl(file_args.answers_file, out_data)
 
-    generated_texts = tokenizer.batch_decode(generation, skip_special_tokens=True)
-    #seg_mask = (torch.sigmoid(seg_logit) > 0.5) * 1.0
-
-    print('question', question)
-    print('generated_texts', generated_texts[0])
-
-    # image = image_np[0]
-    # slice = image.shape[0]
-    # for i in range(slice):
-    #     plt.figure()
-    #     plt.subplot(1, 2, 1)
-    #     plt.imshow(image[i], cmap='gray')
-    #     plt.axis('off')
-    #     plt.subplot(1, 2, 2)
-    #     plt.imshow(seg_mask[0][0][i].cpu().numpy(), cmap='gray')
-    #     plt.axis('off')
-    #     plt.show()
-
-    '''image = sikt.GetImageFromArray(image_np)
-    ssv.display(image)
-
-    seg = sikt.GetImageFromArray(seg_mask.cpu().numpy()[0])
-    ssv.display(seg)'''
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--image-folder", type=str, default="")
+    parser.add_argument("--question-file", type=str, default="tables/question.jsonl")
+    parser.add_argument("--answers-file", type=str, default="answer.jsonl")
+    args = parser.parse_args()
+
+    main(args)
