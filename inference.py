@@ -83,6 +83,7 @@ def main():
         image_np = nii_process(image_np)
     else:
         image_np = np.load(args.image_path)
+    print(image_np.shape)
     image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
 
     generation = model.generate(image_pt, input_id, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
