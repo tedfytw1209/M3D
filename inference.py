@@ -98,6 +98,7 @@ def main():
     parser.add_argument("--question-file", type=str, default="tables/question.jsonl")
     parser.add_argument("--answers-file", type=str, default="answer.jsonl")
     args = parser.parse_args_into_dataclasses()[0]
+    add_args = parser.parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained(
         args.model_name_or_path,
@@ -115,12 +116,12 @@ def main():
     model = model.to(device=device)
     
     #inference data
-    questions = [json.loads(q) for q in open(os.path.expanduser(args.question_file), "r")]
+    questions = [json.loads(q) for q in open(os.path.expanduser(add_args.question_file), "r")]
     question_keys = [k for k in questions[0].keys()]
     img_key = get_img_key(question_keys)
     ques_key = 'text'
     out_data = []
-    ans_file = open(args.answers_file, "w")
+    ans_file = open(add_args.answers_file, "w")
     i = 0
     for question_row in tqdm(questions):
         i += 1
@@ -137,7 +138,7 @@ def main():
         image_tokens = "<im_patch>" * args.proj_out_num
         input_txt = image_tokens + question
         input_id = tokenizer(input_txt, return_tensors="pt")['input_ids'].to(device=device)
-        img_path = os.path.join(args.image_folder, question_row[img_key])
+        img_path = os.path.join(add_args.image_folder, question_row[img_key])
 
         if img_path.endswith('.nii') or img_path.endswith('.nii.gz'):
             image_np = nib.load(img_path).get_fdata()
