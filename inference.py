@@ -117,6 +117,7 @@ def main(file_args):
     img_key = get_img_key(question_keys)
     ques_key = 'text'
     out_data = []
+    ans_file = open(file_args.answers_file, "w")
     i = 0
     for question_row in tqdm(questions):
         i += 1
@@ -157,9 +158,11 @@ def main(file_args):
                     "answer_id": ans_id,
                     "model_id": args.model_name_or_path,
                     "metadata": {}}
+        ans_file.write(json.dumps(out_dict) + "\n")
+        ans_file.flush()
         out_data.append(out_dict)
-        
-    save_jsonl(file_args.answers_file, out_data)
+    ans_file.close()
+    #save_jsonl(file_args.answers_file, out_data)
 
 
 if __name__ == "__main__":
