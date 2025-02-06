@@ -6,7 +6,7 @@ import torch
 import transformers
 from transformers import AutoTokenizer, LlamaForCausalLM
 from dataclasses import dataclass, field
-from LaMed.src.dataset.multi_dataset import UniDatasets, CapDataset, TextDatasets, VQADataset
+from LaMed.src.dataset.multi_dataset import UniDatasets, CapDataset, TextDatasets, VQADataset, CapDatasets
 from LaMed.src.model.language_model import LamedLlamaForCausalLM, LamedPhi3ForCausalLM
 from LaMed.src.train.lamed_trainer import LaMedTrainer
 
@@ -263,6 +263,7 @@ class DataCollator:
 def main():
     global local_rank
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
+    parser.add_argument("--only-cap", action="store_true", default=False)
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     local_rank = training_args.local_rank
@@ -381,6 +382,8 @@ def main():
 
     if model_args.tune_mm_mlp_adapter:
         train_dataset = TextDatasets(data_args, tokenizer, mode='train')
+    elif data_args.only_cap:
+        train_dataset = CapDatasets(data_args, tokenizer, mode='train')
     else:
         train_dataset = UniDatasets(data_args, tokenizer, mode='train')
 

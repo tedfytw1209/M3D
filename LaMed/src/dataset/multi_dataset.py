@@ -1175,6 +1175,20 @@ class TextDatasets(Dataset):
     def __getitem__(self, idx):
         return self.dataset[idx]
 
+class CapDatasets(Dataset):
+    def __init__(self, args, tokenizer, mode='train'):
+        super(CapDatasets, self).__init__()
+        self.ds_list = [
+            CapDataset(args, tokenizer, mode),
+        ]
+        self.dataset = ConcatDataset(self.ds_list)
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        return self.dataset[idx]
+
 
 class UniDatasets(Dataset):
     def __init__(self, args, tokenizer, mode='train'):
