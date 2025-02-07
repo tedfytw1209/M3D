@@ -3,14 +3,9 @@ import numpy as np
 import pandas as pd
 import nibabel as nib
 import json
-from PIL import Image
-import concurrent.futures
 from tqdm import tqdm
-from collections import Counter
-import unicodedata
 import monai.transforms as mtf
 from multiprocessing import Pool
-from unidecode import unidecode
 
 # input_dir = 'PATH/M3D_Cap/ct_quizze/'
 # output_dir = 'PATH/M3D_Cap_npy/ct_quizze/'
