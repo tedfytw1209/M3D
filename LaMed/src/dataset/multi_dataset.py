@@ -1232,7 +1232,7 @@ class LDCTNIIDataset(Dataset):
             try:
                 data = self.data_list[idx]
                 image_path = data["nii"]
-                image_path = image_path.replace('.nii', '.npy') #may need to change
+                image_path = image_path.replace('.nii.gz', '.npy') #may need to change
                 image_abs_path = os.path.join(self.data_root, image_path)
 
                 image = np.load(image_abs_path)  # nomalized 0-1, C,D,H,W

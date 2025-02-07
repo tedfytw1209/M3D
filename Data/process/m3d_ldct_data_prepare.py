@@ -27,11 +27,19 @@ transform = mtf.Compose([
     mtf.Resize(spatial_size=[32, 256, 256], mode="bilinear")
 ])
 
+def load_jsonl_file(jsonl_file):
+    try:
+        with open(jsonl_file) as fp:
+            list_data_dict = json.load(fp)
+    except:
+        with open(jsonl_file) as fp:
+            list_data_dict = [json.loads(q) for q in fp]
+    return list_data_dict
 
 def process_nii_files(nii_file):
     output_id_folder = output_dir
     input_id_folder = input_dir
-    nii_name = nii_file.replace('.nii', '')
+    nii_name = nii_file.replace('.nii.gz', '')
 
     os.makedirs(output_id_folder, exist_ok=True)
 
@@ -49,13 +57,9 @@ def process_nii_files(nii_file):
         print("This folder is vstack error: ", output_path)
 
 
-data_path = ""
-try:
-    with open(data_path) as fp:
-        list_data_dict = json.load(fp)
-except:
-    with open(data_path) as fp:
-        list_data_dict = [json.loads(q) for q in fp]
+data_path = "/blue/bianjiang/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/questions_Report_notes_train_nii.jsonl"
+data_path2 = "/blue/bianjiang/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/questions_Report_notes_test_nii.jsonl"
+list_data_dict = load_jsonl_file(data_path) + load_jsonl_file(data_path2)
 nii_files = [data_dict['nii'] for data_dict in list_data_dict]
 
 with Pool(processes=32) as pool:
