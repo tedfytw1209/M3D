@@ -39,6 +39,8 @@ def process_nii_files(nii_file):
     os.makedirs(output_id_folder, exist_ok=True)
 
     output_path = os.path.join(output_dir, f'{nii_name}.npy')
+    if os.path.exists(output_path):
+        return
 
     try:
         final_3d_image = nib.load(os.path.join(input_id_folder,nii_file)).get_fdata()
@@ -48,7 +50,6 @@ def process_nii_files(nii_file):
         img_trans = transform(image)
         np.save(output_path, img_trans)
     except:
-        print(final_3d_image.shape)
         print("This folder is vstack error: ", output_path)
 
 
