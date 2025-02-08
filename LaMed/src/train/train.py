@@ -266,8 +266,10 @@ def main():
     global local_rank
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
     parser.add_argument("--only-cap", action="store_true", default=False)
-    model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-
+    all_args = parser.parse_args_into_dataclasses()
+    print(len(all_args))
+    model_args, data_args, training_args = all_args
+    
     local_rank = training_args.local_rank
 
     rank0_print("="*20 + " Tokenizer preparation " + "="*20)
