@@ -6,7 +6,7 @@ import torch
 import transformers
 from transformers import AutoTokenizer, LlamaForCausalLM
 from dataclasses import dataclass, field
-from LaMed.src.dataset.multi_dataset import UniDatasets, CapDataset, TextDatasets, VQADataset, CapDatasets
+from LaMed.src.dataset.multi_dataset import UniDatasets, CapDataset, TextDatasets, VQADataset, CapDatasets, LDCTNIIDataset
 from LaMed.src.model.language_model import LamedLlamaForCausalLM, LamedPhi3ForCausalLM
 from LaMed.src.train.lamed_trainer import LaMedTrainer
 
@@ -391,8 +391,11 @@ def main():
         train_dataset = CapDatasets(data_args, tokenizer, mode='train')
     else:
         train_dataset = UniDatasets(data_args, tokenizer, mode='train')
-
-    eval_dataset = CapDataset(data_args, tokenizer, mode='validation')
+    
+    if other_args.only_cap:
+        eval_dataset = LDCTNIIDataset(data_args, tokenizer, mode='validation')
+    else:
+        eval_dataset = CapDataset(data_args, tokenizer, mode='validation')
     data_collator = DataCollator(data_args.seg_enable)
 
     rank0_print("="*20 + " Training " + "="*20)
