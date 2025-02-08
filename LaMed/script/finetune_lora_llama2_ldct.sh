@@ -8,8 +8,6 @@ accelerate launch LaMed/src/train/train.py \
     --model_type llama2 \
     --lora_enable True \
     --vision_tower vit3d \
-    --pretrain_vision_model ./LaMed/pretrained_model/M3D-CLIP/pretrained_ViT.bin \
-    --pretrain_mm_mlp_adapter ./LaMed/output/LaMed-pretrain-0000/mm_projector.bin \
     --only-cap \
     --bf16 True \
     --output_dir ./LaMed/output/LaMed-finetune-0000 \
