@@ -56,22 +56,24 @@ class ModelArguments:
 
 @dataclass
 class DataArguments:
-    data_root: str = field(default="./Data/data/", metadata={"help": "Root directory for all data."})
+    data_root: str = field(default="/blue/bianjiang/tienyuchang/CT_npy/", metadata={"help": "Root directory for all data."})
 
     # caption data
-    cap_data_path: str = field(default="./Data/data/M3D_Cap_npy/M3D_Cap.json", metadata={"help": "Path to caption data."})
-
+    #cap_data_path: str = field(default="./Data/data/M3D_Cap_npy/M3D_Cap.json", metadata={"help": "Path to caption data."})
+    cap_data_path: str = field(default="/blue/bianjiang/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/Report_notes_test_nii.jsonl", metadata={"help": "Path to caption data."})
     # VQA data
+    '''
     vqa_data_train_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_train.csv", metadata={"help": "Path to training VQA data."})
     vqa_data_val_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_val.csv", metadata={"help": "Path to validation VQA data."})
     vqa_data_test_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_test.csv", metadata={"help": "Path to testing VQA data."})
-
     vqa_yn_data_train_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_yn_train.csv", metadata={"help": "Path to training VQA Yes or No data."})
-
+    '''
     # positioning & segmentation data
+    '''
     seg_data_path: str = field(default="./Data/data/M3D_Seg_npy/", metadata={"help": "Path to segmentation data."})
     refseg_data_train_path: str = field(default="./Data/data/M3D_RefSeg_npy/M3D_RefSeg.csv", metadata={"help": "Path to refering segmentation data."})
     refseg_data_test_path: str = field(default="./Data/data/M3D_RefSeg_npy/M3D_RefSeg_test.csv", metadata={"help": "Path to refering segmentation data."})
+    '''
 
 
 @dataclass
