@@ -268,7 +268,8 @@ def main():
     parser.add_argument("--only-cap", action="store_true", default=False)
     all_args = parser.parse_args_into_dataclasses()
     print(len(all_args))
-    model_args, data_args, training_args = all_args
+    print(all_args)
+    model_args, data_args, training_args, other_args = all_args
     
     local_rank = training_args.local_rank
 
@@ -386,7 +387,7 @@ def main():
 
     if model_args.tune_mm_mlp_adapter:
         train_dataset = TextDatasets(data_args, tokenizer, mode='train')
-    elif data_args.only_cap:
+    elif other_args.only_cap:
         train_dataset = CapDatasets(data_args, tokenizer, mode='train')
     else:
         train_dataset = UniDatasets(data_args, tokenizer, mode='train')
