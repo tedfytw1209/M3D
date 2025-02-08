@@ -10,7 +10,7 @@ accelerate launch LaMed/src/train/train.py \
     --vision_tower vit3d \
     --only-cap \
     --bf16 True \
-    --output_dir ./LaMed/output/LaMed-finetune-0000 \
+    --output_dir /orange/bianjiang/tienyu/m3d_model/ \
     --num_train_epochs 2 \
     --per_device_train_batch_size 8 \
     --per_device_eval_batch_size 4 \
@@ -29,4 +29,4 @@ accelerate launch LaMed/src/train/train.py \
     --gradient_checkpointing False \
     --dataloader_pin_memory True\
     --dataloader_num_workers 8 \
-    --report_to tensorboard
+    --report_to wandb
