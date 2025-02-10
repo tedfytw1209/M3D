@@ -139,20 +139,23 @@ def main():
         input_txt = image_tokens + question
         input_id = tokenizer(input_txt, return_tensors="pt")['input_ids'].to(device=device)
         img_path = os.path.join(add_args.image_folder, question_row[img_key])
+        try:
+            if img_path.endswith('.nii') or img_path.endswith('.nii.gz'):
+                image_np = nib.load(img_path).get_fdata()
+                image_np = nii_process(image_np)
+                image_pt = torch.Tensor(image_np).unsqueeze(0).to(dtype=dtype, device=device)
+            else:
+                image_np = np.load(img_path)
+                image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
+            #print(image_np.shape)
 
-        if img_path.endswith('.nii') or img_path.endswith('.nii.gz'):
-            image_np = nib.load(img_path).get_fdata()
-            image_np = nii_process(image_np)
-            image_pt = torch.Tensor(image_np).unsqueeze(0).to(dtype=dtype, device=device)
-        else:
-            image_np = np.load(img_path)
-            image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
-        #print(image_np.shape)
+            generation = model.generate(image_pt, input_id, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
+            # generation, seg_logit = model.generate(image_pt, input_id, seg_enable=True, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
 
-        generation = model.generate(image_pt, input_id, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
-        # generation, seg_logit = model.generate(image_pt, input_id, seg_enable=True, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
-
-        generated_texts = tokenizer.batch_decode(generation, skip_special_tokens=True)
+            generated_texts = tokenizer.batch_decode(generation, skip_special_tokens=True)
+        except Exception as e:
+            print(f"Error: {e}")
+            generated_texts = ["Error: " + str(e)]
         #seg_mask = (torch.sigmoid(seg_logit) > 0.5) * 1.0
         #print('question', question)
         #print('generated_texts', generated_texts[0])
