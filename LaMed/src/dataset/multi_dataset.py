@@ -1193,7 +1193,7 @@ class LDCTNIIDataset(Dataset):
             with open(args.cap_data_path) as fp:
                 self.data_list = [json.loads(q) for q in fp]
         #self.data_list = self.json_file[mode]
-
+        self.data_len = len(self.data_list)
         self.caption_prompts = Caption_templates
 
         train_transform = mtf.Compose(
@@ -1220,6 +1220,7 @@ class LDCTNIIDataset(Dataset):
             self.transform = train_transform
         elif mode == 'validation':
             self.transform = val_transform
+            self.data_list = self.data_list[:self.data_len // 20]
         elif 'test' in mode:
             self.transform = val_transform
 

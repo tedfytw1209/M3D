@@ -112,7 +112,7 @@ class TrainingArguments(transformers.TrainingArguments):
     eval_accumulation_steps: int = 1
     eval_steps: float = 0.04
     save_strategy: str = "steps"
-    save_steps: int = 2000
+    save_steps: int = 5000
     save_total_limit: int = 2
     learning_rate: float = 1e-4
     weight_decay: float = 0.
