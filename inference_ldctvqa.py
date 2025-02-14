@@ -101,7 +101,7 @@ def main():
     questions = [json.loads(q) for q in open(os.path.expanduser(add_args.question_file), "r")]
     question_keys = [k for k in questions[0].keys()]
     img_key = get_img_key(question_keys)
-    ques_key = 'text'
+    ques_key = 'prompt'
     out_data = []
     ans_file = open(add_args.answers_file, "w")
     i = 0

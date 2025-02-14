@@ -1309,9 +1309,9 @@ class LDCTVQADataset(VQAYNDataset):
         for data in data_list:
             new_data_list.append({
                 "Image Path": data["nii"].replace('.nii.gz', '.npy'),
-                "Question": data["question"],
-                "Answer": data["answer"],
-                "Answer Choice": data['answer'],
+                "Question": data["prompt"],
+                "Answer": data["text"],
+                "Answer Choice": data['text'],
                 "Question Type": data["question_type"]
             })
         self.data_list = new_data_list
