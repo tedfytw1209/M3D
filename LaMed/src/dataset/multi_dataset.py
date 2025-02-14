@@ -1290,6 +1290,62 @@ class LDCTNIIDataset(Dataset):
                 print(f"Error in __getitem__ at index {idx}: {e}")
                 idx = random.randint(0, len(self.data_list) - 1)
 
+class LDCTVQADataset(VQAYNDataset):
+    def __init__(self, args, tokenizer, mode="train"):
+        self.args = args
+        self.data_root = args.data_root
+        self.tokenizer = tokenizer
+        self.mode = mode
+
+        self.image_tokens = "<im_patch>" * args.proj_out_num
+        #myvqa: idx	question	answer	question_type
+        try:
+            with open(args.vqa_yn_data_train_path) as fp:
+                data_list = json.load(fp)
+        except:
+            with open(args.vqa_yn_data_train_path) as fp:
+                data_list = [json.loads(q) for q in fp]
+        new_data_list = []
+        for data in data_list:
+            new_data_list.append({
+                "Image Path": data["nii"].replace('.nii.gz', '.npy'),
+                "Question": data["question"],
+                "Answer": data["answer"],
+                "Answer Choice": data['answer'],
+                "Question Type": data["question_type"]
+            })
+        self.data_list = new_data_list
+        #self.data_list = self.json_file[mode]
+        self.data_len = len(self.data_list)
+
+        train_transform = mtf.Compose(
+            [
+                mtf.RandRotate90(prob=0.5, spatial_axes=(1, 2)),
+                mtf.RandFlip(prob=0.10, spatial_axis=0),
+                mtf.RandFlip(prob=0.10, spatial_axis=1),
+                mtf.RandFlip(prob=0.10, spatial_axis=2),
+                mtf.RandScaleIntensity(factors=0.1, prob=0.5),
+                mtf.RandShiftIntensity(offsets=0.1, prob=0.5),
+
+                mtf.ToTensor(dtype=torch.float),
+            ]
+        )
+
+        val_transform = mtf.Compose(
+                [
+                    mtf.ToTensor(dtype=torch.float),
+                ]
+            )
+        set_track_meta(False)
+
+        if mode == 'train':
+            self.transform = train_transform
+        elif mode == 'validation':
+            self.transform = val_transform
+            self.data_list = self.data_list[:self.data_len // 20]
+        elif 'test' in mode:
+            self.transform = val_transform
+
 class CapDatasets(Dataset):
     def __init__(self, args, tokenizer, mode='train'):
         super(CapDatasets, self).__init__()
