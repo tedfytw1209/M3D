@@ -65,7 +65,7 @@ def save_jsonl(out_path,data):
 
 @dataclass
 class AllArguments:
-    model_name_or_path: str = field(default="/orange/bianjiang/tienyu/m3d_model/m3d_ldct_lora_2ep")
+    model_name_or_path: str = field(default="/orange/chenaokun1990/tienyu/m3d_model/m3d_ldct_lora_2ep")
 
     proj_out_num: int = field(default=256, metadata={"help": "Number of output tokens in Projector."})
     image_path: str = field(default="./Data/data/examples/example_04.npy")

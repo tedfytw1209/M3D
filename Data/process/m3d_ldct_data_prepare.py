@@ -10,8 +10,8 @@ from multiprocessing import Pool
 # input_dir = 'PATH/M3D_Cap/ct_quizze/'
 # output_dir = 'PATH/M3D_Cap_npy/ct_quizze/'
 
-input_dir = '/blue/bianjiang/tienyuchang/CT_nii/'
-output_dir = '/blue/bianjiang/tienyuchang/CT_npy/'
+input_dir = '/blue/chenaokun1990/tienyuchang/CT_nii/'
+output_dir = '/blue/chenaokun1990/tienyuchang/CT_npy/'
 
 # Get all subfolders [00001, 00002....]
 #subfolders = [folder for folder in os.listdir(input_dir) if os.path.isdir(os.path.join(input_dir, folder))]
@@ -53,8 +53,8 @@ def process_nii_files(nii_file):
         print("This folder is vstack error: ", output_path)
 
 
-data_path = "/blue/bianjiang/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/questions_Report_notes_train_nii.jsonl"
-data_path2 = "/blue/bianjiang/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/questions_Report_notes_test_nii.jsonl"
+data_path = "/blue/chenaokun1990/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/questions_Report_notes_train_nii.jsonl"
+data_path2 = "/blue/chenaokun1990/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/questions_Report_notes_test_nii.jsonl"
 list_data_dict = load_jsonl_file(data_path) + load_jsonl_file(data_path2)
 nii_files = [data_dict['nii'] for data_dict in list_data_dict]
 
