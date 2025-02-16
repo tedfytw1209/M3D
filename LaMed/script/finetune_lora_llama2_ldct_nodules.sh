@@ -11,7 +11,7 @@ accelerate launch LaMed/src/train/train.py \
     --vision_tower vit3d \
     --only-cap \
     --bf16 True \
-    --output_dir /orange/chenaokun1990/tienyu/m3d_model/m3d_nodule_lora_finetune/ \
+    --output_dir /orange/chenaokun1990/tienyu/m3d_lora/m3d_nodules_lora_2ep/ \
     --model_max_length 512 \
     --num_train_epochs 2 \
     --per_device_train_batch_size 8 \
