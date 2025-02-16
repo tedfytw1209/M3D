@@ -56,11 +56,11 @@ class ModelArguments:
 
 @dataclass
 class DataArguments:
-    data_root: str = field(default="/blue/bianjiang/tienyuchang/CT_npy/", metadata={"help": "Root directory for all data."})
+    data_root: str = field(default="/blue/chenaokun1990/tienyuchang/CT_npy/", metadata={"help": "Root directory for all data."})
 
     # caption data
     #cap_data_path: str = field(default="./Data/data/M3D_Cap_npy/M3D_Cap.json", metadata={"help": "Path to caption data."})
-    cap_data_path: str = field(default="/blue/bianjiang/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/Report_notes_train_nii.jsonl", metadata={"help": "Path to caption data."})
+    cap_data_path: str = field(default="/blue/chenaokun1990/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/Report_notes_train_nii.jsonl", metadata={"help": "Path to caption data."})
     # VQA data
     '''
     vqa_data_train_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_train.csv", metadata={"help": "Path to training VQA data."})
