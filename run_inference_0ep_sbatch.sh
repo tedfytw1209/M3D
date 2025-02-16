@@ -7,9 +7,6 @@
 #SBATCH --gpus=a100:1
 #SBATCH --time=12:00:00
 #SBATCH --output=%x.%j.out
-#SBATCH --account=yonghui.wu
-#SBATCH --qos=yonghui.wu
-#SBATCH --reservation=gatortrongpt
 
 
 module load conda
