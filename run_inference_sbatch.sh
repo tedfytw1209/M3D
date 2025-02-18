@@ -14,7 +14,7 @@ module load conda
 conda activate m3d
 
 python inference.py --model_name_or_path /orange/chenaokun1990/tienyu/m3d_model/m3d_ldct_lora_2ep --image-folder /blue/chenaokun1990/tienyuchang/CT_nii/ \
- --question-file Data/data/questions_Report_notes_test_nii.jsonl --answers-file eval_output/answer_m3d_lora_notes.jsonl
+ --question-file Data/data/questions_Report_notes_test_nii.jsonl --answers-file eval_output/answer_m3d_lora_notes_2ep.jsonl
 
-#python inference.py --model_name_or_path /orange/chenaokun1990/tienyu/m3d_model/m3d_ldct_lora_2ep --image-folder /blue/chenaokun1990/tienyuchang/CT_nii/ \
-# --question-file Data/data/questions_Report_nodules_test_nii.jsonl --answers-file eval_output/answer_m3d_lora_notes.jsonl
+python inference.py --model_name_or_path /blue/chenaokun1990/tienyuchang/m3d_nodules_lora_2ep/ --image-folder /blue/chenaokun1990/tienyuchang/CT_nii/ \
+ --question-file Data/data/questions_Report_nodules_test_nii.jsonl --answers-file eval_output/answer_m3d_lora_nodules_2ep.jsonl
