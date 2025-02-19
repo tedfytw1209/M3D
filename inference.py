@@ -149,7 +149,7 @@ def main():
                 image_pt = torch.from_numpy(image_np).unsqueeze(0).to(dtype=dtype, device=device)
             #print(image_np.shape)
 
-            generation = model.generate(image_pt, input_id, max_new_tokens=512, do_sample=True, top_p=0.9, temperature=1.0)
+            generation = model.generate(image_pt, input_id, max_new_tokens=1024, do_sample=True, top_p=0.9, temperature=1.0)
             # generation, seg_logit = model.generate(image_pt, input_id, seg_enable=True, max_new_tokens=256, do_sample=True, top_p=0.9, temperature=1.0)
 
             generated_texts = tokenizer.batch_decode(generation, skip_special_tokens=True)
