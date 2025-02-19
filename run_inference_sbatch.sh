@@ -10,7 +10,6 @@
 
 
 module load conda
-
 conda activate m3d
 
 python inference.py --model_name_or_path /orange/chenaokun1990/tienyu/m3d_model/m3d_ldct_lora_2ep --image-folder /blue/chenaokun1990/tienyuchang/CT_nii/ \

@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 import monai.transforms as mtf
 import json
 from tqdm import tqdm
-import shortuuid
 
 def seed_everything(seed):
     torch.manual_seed(seed)
@@ -159,11 +158,9 @@ def main():
         #seg_mask = (torch.sigmoid(seg_logit) > 0.5) * 1.0
         #print('question', question)
         #print('generated_texts', generated_texts[0])
-        ans_id = shortuuid.uuid()
         out_dict = {"question_id": idx,
                     "prompt": question,
                     "text": generated_texts[0],
-                    "answer_id": ans_id,
                     "model_id": args.model_name_or_path,
                     "metadata": {}}
         ans_file.write(json.dumps(out_dict) + "\n")
