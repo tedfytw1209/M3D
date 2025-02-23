@@ -1319,9 +1319,9 @@ class LDCTVQADataset(VQAYNDataset):
                 "Answer Choice": data["conversations"][1]["value"],
                 "Question Type": data["question_type"]
             })
-        self.data_list = new_data_list
+        self.data_list = pd.DataFrame(new_data_list)
         #self.data_list = self.json_file[mode]
-        self.data_len = len(self.data_list)
+        self.data_len = self.data_list.shape[0]
 
         train_transform = mtf.Compose(
             [
@@ -1347,7 +1347,7 @@ class LDCTVQADataset(VQAYNDataset):
             self.transform = train_transform
         elif mode == 'validation':
             self.transform = val_transform
-            self.data_list = self.data_list[:self.data_len // 20]
+            self.data_list = self.data_list.iloc[:self.data_len // 20]
         elif 'test' in mode:
             self.transform = val_transform
 
