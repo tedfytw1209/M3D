@@ -2,7 +2,7 @@
 
 # run "accelerate config" first!
 
-accelerate launch LaMed/src/train/train.py \
+accelerate launch --main_process_port 0 LaMed/src/train/train.py \
     --version v0 \
     --model_name_or_path /orange/chenaokun1990/tienyu/huggingface/hub/models--GoodBaiBai88--M3D-LaMed-Llama-2-7B/snapshots/87f6f56001c2dd4d005c0d10c17edba4ffbf36a5/ \
     --vqa_yn_data_train_path /blue/chenaokun1990/tienyuchang/M3D/Data/data/VQA_large_nodule_train_nii_wunk.jsonl \
