@@ -6,7 +6,7 @@ import torch
 import transformers
 from transformers import AutoTokenizer, LlamaForCausalLM
 from dataclasses import dataclass, field
-from LaMed.src.dataset.multi_dataset import UniDatasets, CapDataset, TextDatasets, VQADataset, CapDatasets, LDCTNIIDataset
+from LaMed.src.dataset.multi_dataset import UniDatasets, CapDataset, TextDatasets, VQADataset, CapDatasets, LDCTNIIDataset, LDCTVQADataset
 from LaMed.src.model.language_model import LamedLlamaForCausalLM, LamedPhi3ForCausalLM
 from LaMed.src.train.lamed_trainer import LaMedTrainer
 
@@ -62,18 +62,18 @@ class DataArguments:
     #cap_data_path: str = field(default="./Data/data/M3D_Cap_npy/M3D_Cap.json", metadata={"help": "Path to caption data."})
     cap_data_path: str = field(default="/blue/chenaokun1990/tienyuchang/VILA/playground/data/eval/LungCancer_3DCT/Report_notes_train_nii.jsonl", metadata={"help": "Path to caption data."})
     # VQA data
-    '''
+
     vqa_data_train_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_train.csv", metadata={"help": "Path to training VQA data."})
     vqa_data_val_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_val.csv", metadata={"help": "Path to validation VQA data."})
     vqa_data_test_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_test.csv", metadata={"help": "Path to testing VQA data."})
     vqa_yn_data_train_path: str = field(default="./Data/data/M3D-VQA/M3D_VQA_yn_train.csv", metadata={"help": "Path to training VQA Yes or No data."})
-    '''
+
     # positioning & segmentation data
-    '''
+
     seg_data_path: str = field(default="./Data/data/M3D_Seg_npy/", metadata={"help": "Path to segmentation data."})
     refseg_data_train_path: str = field(default="./Data/data/M3D_RefSeg_npy/M3D_RefSeg.csv", metadata={"help": "Path to refering segmentation data."})
     refseg_data_test_path: str = field(default="./Data/data/M3D_RefSeg_npy/M3D_RefSeg_test.csv", metadata={"help": "Path to refering segmentation data."})
-    '''
+
 
 
 @dataclass
@@ -265,6 +265,7 @@ class DataCollator:
 def main():
     global local_rank
     parser = transformers.HfArgumentParser((ModelArguments, DataArguments, TrainingArguments))
+    parser.add_argument("--only-vqa", action="store_true", default=False)
     parser.add_argument("--only-cap", action="store_true", default=False)
     all_args = parser.parse_args_into_dataclasses()
     print(len(all_args))
@@ -387,12 +388,16 @@ def main():
 
     if model_args.tune_mm_mlp_adapter:
         train_dataset = TextDatasets(data_args, tokenizer, mode='train')
+    elif other_args.only_vqa:
+        train_dataset = LDCTVQADataset(data_args, tokenizer, mode='train')
     elif other_args.only_cap:
         train_dataset = CapDatasets(data_args, tokenizer, mode='train')
     else:
         train_dataset = UniDatasets(data_args, tokenizer, mode='train')
     
-    if other_args.only_cap:
+    if other_args.only_vqa:
+        eval_dataset = LDCTVQADataset(data_args, tokenizer, mode='validation')
+    elif other_args.only_cap:
         eval_dataset = LDCTNIIDataset(data_args, tokenizer, mode='validation')
     else:
         eval_dataset = CapDataset(data_args, tokenizer, mode='validation')
