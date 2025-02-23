@@ -1305,13 +1305,18 @@ class LDCTVQADataset(VQAYNDataset):
         except:
             with open(args.vqa_yn_data_train_path) as fp:
                 data_list = [json.loads(q) for q in fp]
+        sample = data_list[0]
+        if 'nii' in sample:
+            img_key = 'nii'
+        else:
+            img_key = 'image'
         new_data_list = []
         for data in data_list:
             new_data_list.append({
-                "Image Path": data["nii"].replace('.nii.gz', '.npy'),
-                "Question": data["prompt"],
-                "Answer": data["text"],
-                "Answer Choice": data['text'],
+                "Image Path": data[img_key].replace('.nii.gz', '.npy'),
+                "Question": data["conversations"][0]["value"],
+                "Answer": data["conversations"][1]["value"],
+                "Answer Choice": data["conversations"][1]["value"],
                 "Question Type": data["question_type"]
             })
         self.data_list = new_data_list
