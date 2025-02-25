@@ -56,6 +56,16 @@ def get_img_key(question_keys):
     else:
         img_key = "image"
     return img_key
+def get_question_key(question_keys):
+    if 'question' in question_keys:
+        ques_key = 'question'
+    elif 'prompt' in question_keys:
+        ques_key = 'prompt'
+    elif "text" in question_keys:
+        ques_key = 'text'
+    else:
+        ques_key = "text"
+    return ques_key
 ##data save
 def save_jsonl(out_path,data):
     with open(out_path, 'w') as outfile:
@@ -101,7 +111,7 @@ def main():
     questions = [json.loads(q) for q in open(os.path.expanduser(add_args.question_file), "r")]
     question_keys = [k for k in questions[0].keys()]
     img_key = get_img_key(question_keys)
-    ques_key = 'prompt'
+    ques_key = get_question_key(question_keys)
     out_data = []
     ans_file = open(add_args.answers_file, "w")
     i = 0
