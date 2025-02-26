@@ -47,14 +47,17 @@ def nii_process(nii_arr):
     return img_trans
 #get img key
 def get_img_key(question_keys):
-    if 'image' in question_keys:
-        img_key = 'image'
+    if 'nii' in question_keys:
+        img_key = 'nii'
+    elif 'npy' in question_keys:
+        img_key = 'npy'
     elif 'filename' in question_keys:
         img_key = 'filename'
-    elif "image:" in question_keys:
-        img_key = 'image:'
+    elif "image" in question_keys:
+        img_key = 'image'
     else:
-        img_key = "image"
+        print("No image key found")
+        exit()
     return img_key
 def get_question_key(question_keys):
     if 'question' in question_keys:
